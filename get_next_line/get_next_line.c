@@ -14,23 +14,30 @@
 
 int		get_next_line(const int fd, char **line)
 {
-	int		op;
 	int		rea;
 	char	buf[BUFF_SIZE + 1];
+	char	*cop;
+	char	*temp;
 
-	if ((op = open(fd, O_RDONLY)) == -1)
+	cop = ft_strnew(1);
+	line = NULL;
+	while((rea = read(fd, buf, BUFF_SIZE)))
 	{
-		write(2, "File name missing.\n", 19);
-		return (1);
+		buf[rea] = '\0';
+		temp = ft_strnjoin(cop, buf);
+		free(cop);
+		cop = ft_strdup(temp);
+		free(temp);
+		if(ft_strchr(buf, '\n'))
+		{
+			
+			break ;
+		}
 	}
-	rea = read(op, buf, BUFF_SIZE);
-	buf[rea] = '\0';
-	ft_putstr(buf);
-	if (close(op) == -1)
-	{
-		ft_putstr("close error");
-		return (1);
-	}
+		ft_putchar('\n');
+		ft_putstr(cop);
+		ft_putchar('\n');
+
 	return (0);
 	
 }
