@@ -6,7 +6,7 @@
 /*   By: widraugr <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/12/13 14:51:39 by widraugr          #+#    #+#             */
-/*   Updated: 2018/12/13 15:47:56 by widraugr         ###   ########.fr       */
+/*   Updated: 2018/12/21 18:48:27 by widraugr         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,19 +16,46 @@
 int main(void)
 {
 	int i;
+	int j;
 	int op;
-	char **arr;
-
-	i = 0;
+	int opMain;
+	char *arr;
+	
+	i = -1;
+	j = 0;
 	arr = NULL;
-	if ((op = open("txt", O_RDONLY)) == -1)
+	op = open("test1", O_RDONLY);
+	opMain = open("test2", O_RDONLY);
+	/*while (j++ < 8)
 	{
-		write(2, "File name missing.\n", 19);
-		return (1);
+		i = get_next_line(op, &arr);
+		ft_putstr(arr);
+		ft_putnbr(i);
+		ft_putstr("\n");
+		free(arr);
+	}*/
+	i = 1;
+	/*while (get_next_line(op, &arr))
+	{
+		ft_putstr(arr);
+		//ft_putnbr(i);
+		ft_putstr("\n");
+		free(arr);
+	}*/
+	while (j++ < 6)
+	{
+		i = get_next_line(op, &arr);
+		ft_putstr(arr);
+		ft_putstr("\n");
+		free(arr);
+	
+		i = get_next_line(opMain, &arr);
+		ft_putstr(arr);
+		ft_putstr("\n");
+		free(arr);
+	
 	}
-	i = get_next_line(op, arr);
-	i = get_next_line(op, arr);
-	i = get_next_line(op, arr);
+	close(opMain);
 	if (close(op) == -1)
 	{
 		ft_putstr("close error");
