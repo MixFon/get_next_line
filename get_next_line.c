@@ -6,13 +6,13 @@
 /*   By: widraugr <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/12/13 14:49:45 by widraugr          #+#    #+#             */
-/*   Updated: 2018/12/21 18:48:21 by widraugr         ###   ########.fr       */
+/*   Updated: 2018/12/25 16:17:16 by widraugr         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
 
-static t_newlst	*ft_crealst(t_newlst *lst, const int fd)
+static t_newlst	*ft_crealst(t_newlst *lst, const int fd, t_newlst *first_lst)
 {
 	if (!lst)
 	{
@@ -21,76 +21,76 @@ static t_newlst	*ft_crealst(t_newlst *lst, const int fd)
 		lst->fd = fd;
 		lst->tail = ft_strnew(0);
 		lst->next = NULL;
+		lst->first_lst = first_lst;
 	}
 	return (lst);
 }
 
 static t_newlst	*ft_iterlst(t_newlst *lst, const int fd)
 {
-	t_newlst	*iter;
+	t_newlst	*pre;
+	t_newlst	*first;
 
-	iter = NULL;
-	iter = lst;
-	while (iter)
+	pre = NULL;
+	if (!lst)
 	{
-		if (iter->fd == fd)
-			return (iter);
-		iter = iter->next;
+		lst = ft_crealst(lst, fd, NULL);
+		lst->first_lst = lst;
 	}
-	if (!iter)
-		iter = ft_crealst(iter, fd);
-	if (lst && lst != iter)
-		lst->next = iter;
-	return (iter);
+	first = lst->first_lst;
+	lst = first;
+	while (lst)
+	{
+		pre = lst;
+		if (lst->fd == fd)
+			return (lst);
+		lst = lst->next;
+	}
+	if (!lst)
+		lst = ft_crealst(lst, fd, first);
+	if (pre)
+		pre->next = lst;
+	return (lst);
 }
 
-static int		ft_cuttail(t_newlst *lst, char **line)
+static int		ft_cuttail(char *tail, t_newlst *lst, char **line)
 {
-	char	*temp;
-	int		num;
+	long long	num;
 
-	num = ft_strcl(lst->tail, '\n');
-	*line = ft_strnjoin("", lst->tail);
-	temp = ft_strdup(lst->tail);
-	lst->tail = ft_strsub(temp, num + 1, ft_strlen(lst->tail) - num);
-	ft_strdel(&temp);
-	return (1);
+	*line = ft_strnjoinfree(*line, tail);
+	if (ft_strchr(tail, '\n'))
+	{
+		num = ft_strcl(tail, '\n');
+		lst->tail = ft_strsub(tail, num + 1, ft_strlen(tail) - num);
+		ft_strdel(&tail);
+		return (1);
+	}
+	ft_strdel(&lst->tail);
+	return (0);
 }
 
 int				get_next_line(const int fd, char **line)
 {
 	static t_newlst *lst;
 	char			*buf;
-	char			*temp;
-	long			rea;
-	long			num;
+	long long		rea;
 
 	buf = NULL;
-	if (fd < 0 || !line || !(*line = ft_strnew(0)) || BUFF_SIZE < 1 || read(fd, 0, 0) < 0)
+	if (fd < 0 || !line || !(*line = ft_strnew(0))
+			|| BUFF_SIZE < 1 || read(fd, 0, 0) < 0)
 		return (-1);
 	lst = ft_iterlst(lst, fd);
-	if (lst->tail && ft_strchr(lst->tail, '\n'))
-		return (ft_cuttail(lst, line));
-	*line = ft_strnjoin(*line, lst->tail);
-	//ft_strdel(&lst->tail);
+	if (lst->tail && ft_cuttail(lst->tail, lst, line))
+		return (1);
 	if (!(buf = ft_strnew(BUFF_SIZE + 1)))
 		return (-1);
 	while ((rea = read(lst->fd, buf, BUFF_SIZE)))
 	{
 		buf[rea] = '\0';
-		temp = ft_strnjoin(*line, buf);
-		ft_strdel(line);
-		*line = ft_strdup(temp);
-		ft_strdel(&temp);
-		if (ft_strchr(buf, '\n'))
-		{
-			num = ft_strcl(buf, '\n');
-			lst->tail = ft_strsub(buf, num + 1, BUFF_SIZE - num);
-			ft_strdel(&buf);
+		if (ft_cuttail(buf, lst, line))
 			return (1);
-		}
 		if (rea < BUFF_SIZE)
 			return (1);
 	}
-		return (0);
+	return (**line ? 1 : 0);
 }

@@ -1,31 +1,29 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   get_next_line.h                                    :+:      :+:    :+:   */
+/*   ft_strequ.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: widraugr <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2018/12/13 11:35:37 by widraugr          #+#    #+#             */
-/*   Updated: 2018/12/21 18:48:24 by widraugr         ###   ########.fr       */
+/*   Created: 2018/12/03 09:57:51 by widraugr          #+#    #+#             */
+/*   Updated: 2018/12/06 10:00:55 by widraugr         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef GET_NEXT_LINE_H
-# define GET_NEXT_LINE_H
-# define BUFF_SIZE 10 
+#include "libft.h"
 
-# include "libft/libft.h"
-# include <fcntl.h>
-# include <unistd.h>
-# include <stdio.h>
-
-typedef struct		s_lst
+int		ft_strequ(char const *s1, char const *s2)
 {
-	char			*tail;
-	int				fd;
-	struct s_lst	*next;
-}					t_newlst;
-
-int					get_next_line(const int fd, char **line);
-
-#endif
+	if (s1 == NULL || s2 == NULL)
+		return (0);
+	if (ft_strlen(s1) != ft_strlen(s2))
+		return (0);
+	while (*s1 && *s2)
+	{
+		if (*s1 != *s2)
+			return (0);
+		s1++;
+		s2++;
+	}
+	return (1);
+}
